@@ -24,27 +24,13 @@ jobs:
 
       - name: Get AWS credentials from SSM Parameter Store
         run: |
-          # SSMパラメータの存在を確認
-          if aws ssm describe-parameters --parameter-filters "Key=Name,Values=parameter-reader-access-key-id" --query "Parameters[*].Name" --output text | grep -q "parameter-reader-access-key-id"; then
-            echo "SSM parameter parameter-reader-access-key-id exists"
-            AWS_ACCESS_KEY_ID=$(aws ssm get-parameter --name parameter-reader-access-key-id --with-decryption --query Parameter.Value --output text)
-            echo "::add-mask::$AWS_ACCESS_KEY_ID"
-            echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
-          else
-            echo "Error: SSM parameter parameter-reader-access-key-id does not exist"
-            exit 1
-          fi
-          
-          if aws ssm describe-parameters --parameter-filters "Key=Name,Values=parameter-reader-secret-access-key" --query "Parameters[*].Name" --output text | grep -q "parameter-reader-secret-access-key"; then
-            echo "SSM parameter parameter-reader-secret-access-key exists"
-            AWS_SECRET_ACCESS_KEY=$(aws ssm get-parameter --name parameter-reader-secret-access-key --with-decryption --query Parameter.Value --output text)
-            echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
-            echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
-          else
-            echo "Error: SSM parameter parameter-reader-secret-access-key does not exist"
-            exit 1
-          fi
-          
+          AWS_ACCESS_KEY_ID=$(aws ssm get-parameter --name parameter-reader-access-key-id --with-decryption --query Parameter.Value --output text)
+          AWS_SECRET_ACCESS_KEY=$(aws ssm get-parameter --name parameter-reader-secret-access-key --with-decryption --query Parameter.Value --output text)
+          # 認証情報をログに出力しないように設定
+          echo "::add-mask::$AWS_ACCESS_KEY_ID"
+          echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
+          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
           echo "AWS_REGION=ap-northeast-1" >> $GITHUB_ENV
 
       - name: Login to Amazon ECR
