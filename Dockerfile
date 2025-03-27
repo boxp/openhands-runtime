@@ -1,16 +1,8 @@
 # ファイルパス: openhands-runtime/Dockerfile
 FROM nikolaik/python-nodejs:python3.12-nodejs22
 
-# AWS CLIのインストール
-RUN apt-get update && apt-get install -y \
-    python3-pip \
-    unzip \
-    curl \
-    && pip3 install --no-cache-dir \
-    awscli \
-    boto3 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# AWS CLIのインストール（最小限の依存関係で）
+RUN pip install --no-cache-dir awscli
 
 # AWS認証情報は、GitHub Actionsがビルド時にSSM Parameter Storeから取得し、
 # ビルド時の環境変数としてコンテナに埋め込む
